@@ -4,9 +4,8 @@ import React from 'react'
 
 export default function AppHeader() {
   return (
-    <div className='p-3 w-full shadow flex justify-between'>
-        <SidebarTrigger />
-        <Button>Sign In</Button>
+    <div className='p-3 w-full shadow'>
+        <SidebarTrigger className='cursor-pointer' />
     </div>
   )
 }
