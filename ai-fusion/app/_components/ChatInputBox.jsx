@@ -5,9 +5,9 @@ import AiMultiModels from './AiMultiModels'
 
 export default function ChatInputBox() {
   return (
-    <div className='relative min-h-screen'>
+    <div className='relative min-h-screen flex flex-col'>
         {/* Main Content */}
-        <div>
+        <div className='flex-1'>
             <AiMultiModels/>
         </div>
         {/* Chat Input Box */}
