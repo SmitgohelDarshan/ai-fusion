@@ -8,7 +8,7 @@ import { useUser } from '@clerk/nextjs'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '@/config/FirebaseConfig'
 import { AiSelectedModelContext } from '@/context/AiSelectedModelContext'
-import { DefaultModel } from '@/shared/AiModels'
+import { DefaultModel } from '@/shared/AiModelsShared'
 import { UserDetailContext } from '@/context/UserDetailContext'
 function Provider({
     children,
@@ -19,9 +19,16 @@ function Provider({
   const [aiSelectedModels, setAiSelectedModels] = useState(DefaultModel);
   const [userDetail, setUserDetail] = useState();
 
-  useEffect(()=>{
-    CreateNewUser();
-  },[user]);
+  // useEffect(()=>{
+  //   CreateNewUser();
+  // },[user]);
+
+  useEffect(() => {
+    // Only run if user is defined and has an email address
+    if (user?.primaryEmailAddress?.emailAddress) {
+      CreateNewUser();
+    }
+  }, [user]);
 
   const CreateNewUser= async() => {
     // If user exist?
@@ -31,7 +38,7 @@ function Provider({
     if (userSnap.exists()) {
         console.log('Existing User');
         const userInfo = userSnap.data();
-        setAiSelectedModels(userInfo?.selectedModelPref);
+        setAiSelectedModels(userInfo?.selectedModelPref || DefaultModel);
         setUserDetail(userInfo);
         return;
     } else {
@@ -61,11 +68,11 @@ function Provider({
               <AppSidebar/>
               
               {/* <div className='w-full overflow-hidden'><AppHeader/>{children}</div> */}
-              <div className='w-full h-screen overflow-x-auto'>
+              <div className='flex flex-col w-full h-screen overflow-hidden'>
                 <AppHeader />
-                {/* <div className="flex-1 overflow-auto"> */}
+                <main className="flex-1 overflow-y-auto">
                   {children}
-                {/* </div> */}
+                </main>
               </div>
             </SidebarProvider>
           </AiSelectedModelContext.Provider>

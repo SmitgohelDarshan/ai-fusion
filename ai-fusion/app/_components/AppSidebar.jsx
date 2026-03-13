@@ -7,6 +7,7 @@ import {
   SidebarGroup,
   SidebarHeader,
 } from "@/components/ui/sidebar"
+import React, { useEffect, useState } from "react"
 import { SignInButton, useUser } from "@clerk/nextjs"
 import { Bolt, Moon, Sun, User2, Zap } from "lucide-react"
 import { useTheme } from "next-themes"
@@ -16,6 +17,13 @@ import UsageCreditProgress from "./UsageCreditProgress"
 export function AppSidebar() {
     const {theme, setTheme} = useTheme();
     const {user} = useUser();
+
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -26,8 +34,17 @@ export function AppSidebar() {
                     <h2 className="font-mono  font-bold text-xl">AI Fusion</h2>
                 </div>
                 <div>
-                    {theme == 'light' ? <Button variant={'ghost'} onClick={()=>setTheme('dark')}><Sun /></Button>
-                        : <Button onClick={()=>setTheme('light')}><Moon /></Button>}
+                  {mounted && (
+                            theme === 'light' ? (
+                                <Button variant={'ghost'} onClick={() => setTheme('dark')}>
+                                    <Sun />
+                                </Button>
+                            ) : (
+                                <Button variant={'ghost'} onClick={() => setTheme('light')}>
+                                    <Moon />
+                                </Button>
+                            )
+                  )}
                 </div>
             </div>
             {user ? 
