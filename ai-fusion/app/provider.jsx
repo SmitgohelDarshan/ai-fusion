@@ -5,7 +5,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from './_components/AppSidebar'
 import AppHeader from './_components/AppHeader'
 import { useUser } from '@clerk/nextjs'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import { db } from '@/config/FirebaseConfig'
 import { AiSelectedModelContext } from '@/context/AiSelectedModelContext'
 import { DefaultModel } from '@/shared/AiModelsShared'
@@ -18,6 +18,7 @@ function Provider({
   const {user} = useUser();
   const [aiSelectedModels, setAiSelectedModels] = useState(DefaultModel);
   const [userDetail, setUserDetail] = useState();
+  const [messages, setMessages] = useState({});
 
   // useEffect(()=>{
   //   CreateNewUser();
@@ -29,6 +30,22 @@ function Provider({
       CreateNewUser();
     }
   }, [user]);
+
+  useEffect(()=>{
+    if (aiSelectedModels) {
+        updateAIModelSelectionPref();
+    }
+  },[aiSelectedModels]);
+
+  const updateAIModelSelectionPref=async()=>{
+    const email = user?.primaryEmailAddress?.emailAddress;
+          if (email) {
+            const docRef = doc(db, "users", email);
+            await updateDoc(docRef, {
+              selectedModelPref: aiSelectedModels // Use the variable, not the state!
+            });
+         }
+  }
 
   const CreateNewUser= async() => {
     // If user exist?
@@ -63,7 +80,7 @@ function Provider({
         disableTransitionOnChange
         {...props}>
         <UserDetailContext.Provider value={{userDetail, setUserDetail}}>  
-          <AiSelectedModelContext.Provider value={{aiSelectedModels, setAiSelectedModels}}>  
+          <AiSelectedModelContext.Provider value={{aiSelectedModels, setAiSelectedModels, messages, setMessages}}>  
             <SidebarProvider>
               <AppSidebar/>
               

@@ -11,18 +11,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Lock, MessageSquare } from "lucide-react";
+import { Loader, Lock, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
 import { useUser } from "@clerk/nextjs";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/config/FirebaseConfig";
 import { UserDetailContext } from "@/context/UserDetailContext";
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function AiMultiModels() {
   const {user} = useUser();
   const [aiModelList, setAiModelList] = useState(AiModelList);
-  const { aiSelectedModels, setAiSelectedModels } = useContext(AiSelectedModelContext);
+  const {aiSelectedModels, setAiSelectedModels, messages, setMessages} = useContext(AiSelectedModelContext);  
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
 
   // // CRITICAL: If context isn't loaded yet, don't render the map
@@ -34,38 +36,54 @@ export default function AiMultiModels() {
         setAiModelList((prev)=>
             prev.map((m)=>
                 m.model === model ? {...m,enable:value} : m))
+
+        setAiSelectedModels((prev)=>({
+            ...prev,
+            [model]:{
+              ...(prev?.[model] ?? {}),
+              enable:value
+            }
+        }))
+
+        console.log(aiSelectedModels);
+        
   }
 
   const onSelectValue = async(parentModel,value)=>{
-    // 1. Create the new object first
-    const updatedModels = {
-      ...aiSelectedModels,
-      [parentModel]: { modelId: value }
-    };
 
-    // 2. Update the UI state
-    setAiSelectedModels(updatedModels);
 
-    // 3. Update Firebase with the NEW object
-    const email = user?.primaryEmailAddress?.emailAddress;
-    if (email) {
-      const docRef = doc(db, "users", email);
-      await updateDoc(docRef, {
-        selectedModelPref: updatedModels // Use the variable, not the state!
-      });
-    }
-    //  setAiSelectedModels(prev => ({
-    //   ...prev, [parentModel]:{modelId: value}
-    //  }))
-     
-    //  // Update to Firebase Database
-    //  const email = user?.primaryEmailAddress?.emailAddress;
-    //   if (email) {
-    //     const docRef = doc(db, "users", email);
-    //     await updateDoc(docRef, {
-    //       selectedModelPref: aiSelectedModels // Use the variable, not the state!
-    //     });
+
+    // // 1. Create the new object first
+    // const updatedModels = {
+    //   ...aiSelectedModels,
+    //   [parentModel]: { modelId: value }
+    // };
+
+    // // 2. Update the UI state
+    // setAiSelectedModels(updatedModels);
+
+    // // 3. Update Firebase with the NEW object
+    // const email = user?.primaryEmailAddress?.emailAddress;
+    // if (email) {
+    //   const docRef = doc(db, "users", email);
+    //   await updateDoc(docRef, {
+    //     selectedModelPref: updatedModels // Use the variable, not the state!
+    //   });
     // }
+
+
+     setAiSelectedModels(prev => ({
+      ...prev, [parentModel]:{modelId: value}
+     }))
+     
+     // Update to Firebase Database
+     const email = user?.primaryEmailAddress?.emailAddress;
+      if (email) {
+        const docRef = doc(db, "users", email);
+        await updateDoc(docRef, {
+          selectedModelPref: aiSelectedModels // Use the variable, not the state!
+        });
+    }
   }
 
 
@@ -119,8 +137,26 @@ export default function AiMultiModels() {
         {model.premium && model.enable && <div className="flex justify-center items-center h-full">
             <Button><Lock/> Upgrade to unlock</Button>
         </div>}
+
+        {model.enable && <div className="flex-1 p-4">
+          <div className="flex-1 p-4 space-y-2">
+            {messages[model.model]?.map((m,i)=>(
+              <div className={`p-2 rounded-md ${m.role == 'user' ? "bg-blue-100 text-blue-900" : "bg-gray-200 text-gray-900"}`}>
+                  {m.role == 'assistant' && (
+                    <span className="text-sm text-gray-300">{m.model??model.model}</span>
+                  )}
+                  <div className="flex gap-3 items-center">
+                    {m.content == 'loading' && <><Loader className="animate-spin"/><span>Thinking...</span></>}
+                  </div>
+                  {m.content !== 'loading' && <Markdown remarkPlugins={[remarkGfm]}>{m.content}</Markdown>}
+              </div>
+            ))}
+          </div>
+        </div>}
         </div>
       ))}
+
+
 
     </div>
   );
