@@ -15,7 +15,7 @@ export async function POST(req) {
     {
       headers: {
         "Content-Type": "application/json",     // Tell server we're sending JSON
-        "Authorization": "Bearer" + process.env.KRAVIXSTUDIO_API_KEY
+        "Authorization": `Bearer ${process.env.KRAVIXSTUDIO_API_KEY}`
       }
     }
   );
