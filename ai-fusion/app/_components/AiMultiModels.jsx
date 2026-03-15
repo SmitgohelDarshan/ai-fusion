@@ -32,6 +32,7 @@ export default function AiMultiModels() {
   //   return <div className="p-10">Loading Models...</div>;
   // }
 
+
   const onToggleChange=(model,value)=>{
         setAiModelList((prev)=>
             prev.map((m)=>
@@ -148,7 +149,7 @@ export default function AiMultiModels() {
                   <div className="flex gap-3 items-center">
                     {m.content == 'loading' && <><Loader className="animate-spin"/><span>Thinking...</span></>}
                   </div>
-                  {m.content !== 'loading' && <Markdown remarkPlugins={[remarkGfm]}>{m.content}</Markdown>}
+                  {m?.content !== 'loading' && m?.content && <Markdown remarkPlugins={[remarkGfm]}>{m?.content}</Markdown>}
               </div>
             ))}
           </div>
