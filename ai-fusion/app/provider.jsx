@@ -53,23 +53,20 @@ function Provider({
     const userSnap = await getDoc(userRef);
 
     if (userSnap.exists()) {
-        console.log('Existing User');
         const userInfo = userSnap.data();
+        // ENSURE THIS LINE IS PRESENT: It syncs the DB data to your Context
+        setUserDetail(userInfo); 
         setAiSelectedModels(userInfo?.selectedModelPref || DefaultModel);
-        setUserDetail(userInfo);
-        return;
     } else {
-      const userData = {
-        name : user?.fullName,
-        email : user?.primaryEmailAddress?.emailAddress,
-        createdAt : new Date(),
-        reminingMsg : 5, // Only for Free users
-        plan : 'Free',
-        credits : 1000 // Paid User
-      }
-      await setDoc(userRef, userData);
-      console.log('New User data saved');
-      setUserDetail(userData);
+        const userData = {
+            name: user?.fullName,
+            email: user?.primaryEmailAddress?.emailAddress,
+            createdAt: new Date(),
+            reminingMsg: 5,
+            plan: 'Free', // Default for new users
+        }
+        await setDoc(userRef, userData);
+        setUserDetail(userData);
     }
   }
   return (

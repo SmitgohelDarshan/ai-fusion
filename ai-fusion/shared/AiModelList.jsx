@@ -42,7 +42,7 @@ export default [
     enable: true,
     subModel: [
       { name: "Mistral Medium 2505", premium: true, id: "mistral-medium-2505" },
-      { name: "Ministral 3B", premium: false, id: "Ministral-3B" },
+      { name: "Ministral 3B", premium: true, id: "Ministral-3B" },
     ],
   },
   {
@@ -51,7 +51,7 @@ export default [
     premium: true,
     enable: true,
     subModel: [
-      { name: "Grok 3 Mini", premium: false, id: "grok-3-mini" },
+      { name: "Grok 3 Mini", premium: true, id: "grok-3-mini" },
       { name: "Grok 3", premium: true, id: "grok-3" },
     ],
   },
@@ -61,8 +61,8 @@ export default [
     premium: true,
     enable: true,
     subModel: [
-      { name: "Cohere Command A", premium: false, id: "cohere-command-a" },
-      { name: "Cohere Command R 08-2024", premium: false, id: "Cohere-command-r-08-2024" },
+      { name: "Cohere Command A", premium: true, id: "cohere-command-a" },
+      { name: "Cohere Command R 08-2024", premium: true, id: "Cohere-command-r-08-2024" },
     ],
   },
   {
